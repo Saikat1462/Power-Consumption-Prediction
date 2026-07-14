@@ -5,7 +5,7 @@
 ### An End-to-End Machine Learning & Time Series Capstone Project
 
 [![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live_Demo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/)
 [![CatBoost](https://img.shields.io/badge/CatBoost-R²_0.9715-FFCC00?style=for-the-badge&logo=catboost&logoColor=black)](https://catboost.ai)
 [![Prophet](https://img.shields.io/badge/Prophet-RMSE_0.6388-0467DF?style=for-the-badge&logo=meta&logoColor=white)](https://facebook.github.io/prophet/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
@@ -16,7 +16,7 @@
 
 <br>
 
-[🚀 Live Dashboard](#-quick-start) · [📊 Results](#-model-performance) · [📓 Notebooks](#-project-notebooks) · [🏗️ Architecture](#%EF%B8%8F-project-architecture)
+[🚀 Live Dashboard](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/) · [📊 Results](#-model-performance) · [📓 Notebooks](#-project-notebooks) · [🏗️ Architecture](#%EF%B8%8F-project-architecture)
 
 </div>
 
@@ -299,6 +299,8 @@ A total of **28 features** were engineered from the raw data to capture complex 
 
 ## 🖥️ Interactive Dashboard
 
+### 🌐 [**➡️ Try the Live Dashboard Here**](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/)
+
 The project includes a **production-quality Streamlit dashboard** (`app.py` — 1,385 lines) with 8 interactive pages:
 
 | Page | Feature |
@@ -322,6 +324,12 @@ The project includes a **production-quality Streamlit dashboard** (`app.py` — 
 ---
 
 ## 🚀 Quick Start
+
+### ☁️ Try it Online (No Installation Needed!)
+
+> **[👉 Launch the Live Dashboard](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/)** — explore the full app instantly in your browser.
+
+### 🖥️ Run Locally
 
 ### Prerequisites
 
@@ -463,6 +471,7 @@ Power-Consumption-Prediction/
 
 [![GitHub](https://img.shields.io/badge/GitHub-Saikat1462-181717?style=for-the-badge&logo=github)](https://github.com/Saikat1462)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Saikat_Sarkar-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/saikat-sarkar-17151a3b1/)
+[![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/)
 
 </div>
 
