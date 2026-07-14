@@ -396,16 +396,38 @@ def inject_sidebar_toggle():
             }
 
             btn.addEventListener('click', function() {
-                // Find native expand buttons
-                const expandBtn = root.querySelector(
-                    '[data-testid="collapsedControl"] button, ' +
-                    '[data-testid="stSidebarCollapseButton"], ' +
-                    'button[kind="headerNoPadding"]'
-                );
-                if (expandBtn) {
-                    expandBtn.click();
-                } else {
-                    // Hard override
+                let success = false;
+                // Possible selectors for the Streamlit expand button
+                const selectors = [
+                    'button[aria-label="Expand sidebar"]',
+                    '[data-testid="collapsedControl"] button',
+                    '[data-testid="collapsedControl"]',
+                    'button[kind="headerNoPadding"]',
+                    '[data-testid="stSidebarCollapseButton"]',
+                    'header button'
+                ];
+                
+                for (let sel of selectors) {
+                    const els = root.querySelectorAll(sel);
+                    if (els.length > 0) {
+                        // Click the first matching element
+                        const target = els[0];
+                        if (typeof target.click === 'function') {
+                            target.click();
+                        }
+                        // Also dispatch a real mouse event to ensure React catches it
+                        target.dispatchEvent(new MouseEvent('click', {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true
+                        }));
+                        success = true;
+                        break;
+                    }
+                }
+                
+                if (!success) {
+                    // Fallback visual override
                     const sidebar = root.querySelector('[data-testid="stSidebar"]');
                     if (sidebar) {
                         sidebar.setAttribute('aria-expanded', 'true');
