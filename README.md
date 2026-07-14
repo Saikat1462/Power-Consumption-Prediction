@@ -4,7 +4,7 @@
 
 ### An End-to-End Machine Learning & Time Series Capstone Project
 
-[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.13.9-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Live_Demo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://power-consumption-prediction-a8jfcxgw9cj9huqomg9god.streamlit.app/)
 [![CatBoost](https://img.shields.io/badge/CatBoost-R²_0.9715-FFCC00?style=for-the-badge&logo=catboost&logoColor=black)](https://catboost.ai)
 [![Prophet](https://img.shields.io/badge/Prophet-RMSE_0.6388-0467DF?style=for-the-badge&logo=meta&logoColor=white)](https://facebook.github.io/prophet/)
