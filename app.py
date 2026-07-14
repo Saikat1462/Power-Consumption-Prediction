@@ -314,10 +314,51 @@ def inject_custom_css():
         line-height: 1.65;
     }
 
-    /* ── Hide Streamlit branding ── */
+    /* ── Hide Streamlit branding (keep sidebar toggle visible) ── */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        backdrop-filter: none !important;
+    }
+    /* Hide the toolbar/decoration but keep the collapse button */
+    header[data-testid="stHeader"] .stAppToolbar {
+        visibility: hidden;
+    }
+
+    /* ── Floating sidebar toggle button ── */
+    .sidebar-toggle-btn {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 999999;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: linear-gradient(135deg, #161b22 0%, #1c2333 100%);
+        color: var(--accent);
+        font-size: 1.3rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        opacity: 0;
+        pointer-events: none;
+    }
+    .sidebar-toggle-btn:hover {
+        background: linear-gradient(135deg, #1c2333 0%, #243049 100%);
+        box-shadow: 0 6px 24px rgba(88,166,255,0.2);
+        transform: scale(1.08);
+    }
+    /* Show the button when sidebar is collapsed */
+    [data-testid="stSidebar"][aria-expanded="false"] ~ section .sidebar-toggle-btn,
+    .sidebar-collapsed .sidebar-toggle-btn {
+        opacity: 1;
+        pointer-events: auto;
+    }
 
     /* ── Dataframe styling ── */
     .stDataFrame { border-radius: var(--radius) !important; }
@@ -328,6 +369,70 @@ def inject_custom_css():
     }
     </style>
     """, unsafe_allow_html=True)
+
+    # Floating sidebar toggle button (appears when sidebar is collapsed)
+    st.markdown("""
+    <div class="sidebar-toggle-btn" id="sidebarToggle" title="Open Menu">☰</div>
+    <script>
+    // Sidebar toggle logic
+    (function() {
+        const btn = document.getElementById('sidebarToggle');
+        if (!btn) return;
+
+        function updateBtnVisibility() {
+            const sidebar = document.querySelector('[data-testid="stSidebar"]');
+            if (sidebar) {
+                const isCollapsed = sidebar.getAttribute('aria-expanded') === 'false';
+                btn.style.opacity = isCollapsed ? '1' : '0';
+                btn.style.pointerEvents = isCollapsed ? 'auto' : 'none';
+            }
+        }
+
+        btn.addEventListener('click', function() {
+            // Try to find and click the native Streamlit expand button
+            const expandBtn = document.querySelector(
+                '[data-testid="stSidebar"] button[aria-label="Close"], ' +
+                'button[data-testid="stSidebarCollapseButton"], ' +
+                'button[data-testid="baseButton-headerNoPadding"]'
+            );
+            
+            // Also try the expand button that appears when sidebar is collapsed
+            const collapsedBtn = document.querySelector(
+                '[data-testid="collapsedControl"] button, ' +
+                'button[kind="headerNoPadding"]'
+            );
+            
+            if (collapsedBtn) {
+                collapsedBtn.click();
+            } else if (expandBtn) {
+                expandBtn.click();
+            } else {
+                // Fallback: directly toggle sidebar attribute
+                const sidebar = document.querySelector('[data-testid="stSidebar"]');
+                if (sidebar) {
+                    sidebar.setAttribute('aria-expanded', 'true');
+                    sidebar.style.transform = 'none';
+                    sidebar.style.width = '21rem';
+                }
+            }
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none';
+        });
+
+        // Observe sidebar changes
+        const observer = new MutationObserver(updateBtnVisibility);
+        const sidebar = document.querySelector('[data-testid="stSidebar"]');
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true, attributeFilter: ['aria-expanded'] });
+        }
+
+        // Initial check and periodic fallback
+        updateBtnVisibility();
+        setInterval(updateBtnVisibility, 500);
+    })();
+    </script>
+    """, unsafe_allow_html=True)
+
 
 
 # ──────────────────────────────────────────────────────────────
