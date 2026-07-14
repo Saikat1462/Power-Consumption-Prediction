@@ -21,6 +21,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
+import streamlit.components.v1 as components
 import zipfile
 
 warnings.filterwarnings("ignore")
@@ -314,47 +315,10 @@ def inject_custom_css():
         line-height: 1.65;
     }
 
-    /* ── Hide Streamlit branding (keep sidebar toggle visible) ── */
+    /* ── Hide Streamlit branding ── */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-        backdrop-filter: none !important;
-    }
-    /* Hide only the toolbar decoration, not the whole header */
-    header[data-testid="stHeader"] .stAppToolbar {
-        visibility: hidden;
-    }
-
-    /* ── Style the native sidebar expand button (collapsed arrow) ── */
-    [data-testid="collapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed;
-        top: 12px;
-        left: 12px;
-        z-index: 999999;
-    }
-    [data-testid="collapsedControl"] button {
-        background: linear-gradient(135deg, #161b22 0%, #1c2333 100%) !important;
-        border: 1px solid #30363d !important;
-        border-radius: 10px !important;
-        color: #58a6ff !important;
-        width: 40px !important;
-        height: 40px !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-        transition: all 0.25s ease;
-    }
-    [data-testid="collapsedControl"] button:hover {
-        background: linear-gradient(135deg, #1c2333 0%, #243049 100%) !important;
-        box-shadow: 0 6px 24px rgba(88,166,255,0.2);
-        transform: scale(1.08);
-    }
-    [data-testid="collapsedControl"] button svg {
-        fill: #58a6ff !important;
-        stroke: #58a6ff !important;
-    }
+    header {visibility: hidden;}
 
     /* ── Dataframe styling ── */
     .stDataFrame { border-radius: var(--radius) !important; }
@@ -365,6 +329,88 @@ def inject_custom_css():
     }
     </style>
     """, unsafe_allow_html=True)
+
+
+def inject_sidebar_toggle():
+    """Inject a floating menu button via st.components.v1.html (supports JS)."""
+    components.html("""
+    <style>
+        #openSidebar {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 999999;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid #30363d;
+            background: linear-gradient(135deg, #161b22 0%, #1c2333 100%);
+            color: #58a6ff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        #openSidebar:hover {
+            background: linear-gradient(135deg, #1c2333 0%, #243049 100%);
+            box-shadow: 0 6px 24px rgba(88,166,255,0.25);
+            transform: scale(1.1);
+        }
+    </style>
+    <button id="openSidebar" title="Open Menu">☰</button>
+    <script>
+        (function() {
+            const btn = document.getElementById('openSidebar');
+            const root = window.parent.document;
+
+            function isSidebarCollapsed() {
+                const sidebar = root.querySelector('[data-testid="stSidebar"]');
+                if (!sidebar) return true;
+                return sidebar.getAttribute('aria-expanded') === 'false';
+            }
+
+            function updateBtn() {
+                if (isSidebarCollapsed()) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+
+            btn.addEventListener('click', function() {
+                // Find the native expand button in parent document
+                const expandBtn = root.querySelector(
+                    '[data-testid="collapsedControl"] button'
+                );
+                if (expandBtn) {
+                    expandBtn.click();
+                } else {
+                    // Fallback: find any sidebar-related expand button
+                    const btns = root.querySelectorAll('button[kind="headerNoPadding"]');
+                    if (btns.length > 0) btns[0].click();
+                }
+                btn.style.display = 'none';
+            });
+
+            // Watch for sidebar changes
+            const sidebar = root.querySelector('[data-testid="stSidebar"]');
+            if (sidebar) {
+                const observer = new MutationObserver(updateBtn);
+                observer.observe(sidebar, {
+                    attributes: true,
+                    attributeFilter: ['aria-expanded']
+                });
+            }
+
+            updateBtn();
+            setInterval(updateBtn, 500);
+        })();
+    </script>
+    """, height=0, width=0)
 
 
 
@@ -1358,6 +1404,7 @@ def main():
     )
 
     inject_custom_css()
+    inject_sidebar_toggle()
 
     # ── Sidebar Navigation ──
     with st.sidebar:
