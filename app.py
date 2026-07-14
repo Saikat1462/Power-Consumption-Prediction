@@ -916,7 +916,6 @@ def page_forecasting():
 
         try:
             if model_choice == "Prophet":
-                # Prophet requires a future DataFrame with 'ds' column
                 future = ts_model.make_future_dataframe(
                     periods=periods,
                     freq="h",
