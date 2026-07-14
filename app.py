@@ -917,10 +917,11 @@ def page_forecasting():
         try:
             if model_choice == "Prophet":
                 # Prophet requires a future DataFrame with 'ds' column
-                last_date = pd.Timestamp("2010-11-26 21:02:00")
-                future = ts_model.make_future_dataframe(periods=periods, freq="h")
-                # Only keep future dates
-                future = future[future["ds"] > last_date].tail(periods)
+                future = ts_model.make_future_dataframe(
+                    periods=periods,
+                    freq="h",
+                    include_history=False
+                )
 
                 for i in range(50):
                     time.sleep(0.01)
