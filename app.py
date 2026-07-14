@@ -334,38 +334,52 @@ def inject_custom_css():
 def inject_sidebar_toggle():
     """Inject a floating menu button via st.components.v1.html (supports JS)."""
     components.html("""
-    <style>
-        #openSidebar {
-            position: fixed;
-            top: 14px;
-            left: 14px;
-            z-index: 999999;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            border: 1px solid #30363d;
-            background: linear-gradient(135deg, #161b22 0%, #1c2333 100%);
-            color: #58a6ff;
-            font-size: 1.4rem;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.45);
-            transition: all 0.25s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        #openSidebar:hover {
-            background: linear-gradient(135deg, #1c2333 0%, #243049 100%);
-            box-shadow: 0 6px 24px rgba(88,166,255,0.25);
-            transform: scale(1.1);
-        }
-    </style>
-    <button id="openSidebar" title="Open Menu">☰</button>
     <script>
         (function() {
-            const btn = document.getElementById('openSidebar');
             const root = window.parent.document;
+            if (root.getElementById('customSidebarToggle')) return;
+            
+            // Create the button in the main Streamlit document
+            const btn = root.createElement('div');
+            btn.id = 'customSidebarToggle';
+            btn.innerHTML = '☰';
+            btn.title = 'Open Menu';
+            
+            // Apply styles inline
+            Object.assign(btn.style, {
+                position: 'fixed',
+                top: '14px',
+                left: '14px',
+                zIndex: '999999',
+                width: '42px',
+                height: '42px',
+                borderRadius: '10px',
+                border: '1px solid #30363d',
+                background: 'linear-gradient(135deg, #161b22 0%, #1c2333 100%)',
+                color: '#58a6ff',
+                fontSize: '1.4rem',
+                cursor: 'pointer',
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.45)',
+                transition: 'all 0.25s ease',
+                fontFamily: 'Inter, sans-serif'
+            });
+            
+            // Hover effects
+            btn.addEventListener('mouseover', function() {
+                btn.style.background = 'linear-gradient(135deg, #1c2333 0%, #243049 100%)';
+                btn.style.boxShadow = '0 6px 24px rgba(88,166,255,0.25)';
+                btn.style.transform = 'scale(1.1)';
+            });
+            btn.addEventListener('mouseout', function() {
+                btn.style.background = 'linear-gradient(135deg, #161b22 0%, #1c2333 100%)';
+                btn.style.boxShadow = '0 4px 16px rgba(0,0,0,0.45)';
+                btn.style.transform = 'scale(1)';
+            });
+            
+            root.body.appendChild(btn);
 
             function isSidebarCollapsed() {
                 const sidebar = root.querySelector('[data-testid="stSidebar"]');
@@ -382,21 +396,27 @@ def inject_sidebar_toggle():
             }
 
             btn.addEventListener('click', function() {
-                // Find the native expand button in parent document
+                // Find native expand buttons
                 const expandBtn = root.querySelector(
-                    '[data-testid="collapsedControl"] button'
+                    '[data-testid="collapsedControl"] button, ' +
+                    '[data-testid="stSidebarCollapseButton"], ' +
+                    'button[kind="headerNoPadding"]'
                 );
                 if (expandBtn) {
                     expandBtn.click();
                 } else {
-                    // Fallback: find any sidebar-related expand button
-                    const btns = root.querySelectorAll('button[kind="headerNoPadding"]');
-                    if (btns.length > 0) btns[0].click();
+                    // Hard override
+                    const sidebar = root.querySelector('[data-testid="stSidebar"]');
+                    if (sidebar) {
+                        sidebar.setAttribute('aria-expanded', 'true');
+                        sidebar.style.transform = 'none';
+                        sidebar.style.width = '21rem';
+                    }
                 }
                 btn.style.display = 'none';
             });
 
-            // Watch for sidebar changes
+            // Watch for sidebar state changes
             const sidebar = root.querySelector('[data-testid="stSidebar"]');
             if (sidebar) {
                 const observer = new MutationObserver(updateBtn);
@@ -406,6 +426,7 @@ def inject_sidebar_toggle():
                 });
             }
 
+            // Sync state
             updateBtn();
             setInterval(updateBtn, 500);
         })();
