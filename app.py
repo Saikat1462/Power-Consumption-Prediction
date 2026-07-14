@@ -21,6 +21,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
+import zipfile
 
 warnings.filterwarnings("ignore")
 
@@ -353,6 +354,21 @@ def load_featured_data() -> pd.DataFrame:
 # ──────────────────────────────────────────────────────────────
 # 5. MODEL LOADING (CACHED)
 # ──────────────────────────────────────────────────────────────
+def extract_if_needed(path):
+    """
+    Extract corresponding ZIP if the PKL file is missing.
+    """
+
+    if path.exists():
+        return
+
+    zip_path = path.with_suffix(".zip")
+
+    if zip_path.exists():
+        print(f"Extracting {zip_path.name}...")
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(path.parent)
+
 @st.cache_resource(show_spinner=False)
 def load_regression_model(key: str):
     """Load a saved regression model by key name."""
@@ -366,8 +382,15 @@ def load_regression_model(key: str):
 def load_forecast_model(key: str):
     """Load a saved forecasting model by key name."""
     path = FORECAST_MODEL_PATHS.get(key)
-    if path is None or not path.exists():
+    if path is None:
         return None
+
+    if key in ["Manual ARIMA", "Auto ARIMA"]:
+        extract_if_needed(path)
+
+    if not path.exists():
+        return None
+
     return joblib.load(path)
 
 
